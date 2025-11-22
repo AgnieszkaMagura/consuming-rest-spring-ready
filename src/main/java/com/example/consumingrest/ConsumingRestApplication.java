@@ -57,25 +57,25 @@ public class ConsumingRestApplication {
             headers.set("requestId", "someID");
             HttpEntity<?> entity = new HttpEntity<>(headers);
 
-            ResponseEntity<Quote[]> response = restTemplate.exchange(
+            ResponseEntity<QuoteResponse[]> response = restTemplate.exchange(
                     BASE_URL + "/apiWithHeader",
                     HttpMethod.GET,
                     entity,
-                    Quote[].class
+                    QuoteResponse[].class
             );
 
-            Quote[] quotes = response.getBody();
+            QuoteResponse[] quoteResponses = response.getBody();
             log.info("Response status: {}", response.getStatusCode());
-            log.info("Number of quotes received: {}", quotes != null ? quotes.length : 0);
+            log.info("Number of quotes received: {}", quoteResponses != null ? quoteResponses.length : 0);
 
-            if (quotes != null && quotes.length > 0) {
-                for (int i = 0; i < Math.min(3, quotes.length); i++) {
-                    Quote quote = quotes[i];
+            if (quoteResponses != null && quoteResponses.length > 0) {
+                for (int i = 0; i < quoteResponses.length; i++) {
+                    QuoteResponse quoteResponse = quoteResponses[i];
                     log.info("Quote {}: type='{}', id={}, text='{}'",
                             i + 1,
-                            quote.type(),
-                            quote.value() != null ? quote.value().id() : null,
-                            quote.value() != null ? quote.value().quote() : null);
+                            quoteResponse.type(),
+                            quoteResponse.value() != null ? quoteResponse.value().id() : null,
+                            quoteResponse.value() != null ? quoteResponse.value().quote() : null);
                 }
             }
 
@@ -88,17 +88,17 @@ public class ConsumingRestApplication {
         try {
             log.info("--- Testing GET /apiWithRequestParam?id=11 ---");
 
-            Quote quote = restTemplate.getForObject(
+            QuoteResponse quoteResponse = restTemplate.getForObject(
                     BASE_URL + "/apiWithRequestParam?id=11",
-                    Quote.class
+                    QuoteResponse.class
             );
 
-            log.info("Quote retrieved: {}", quote);
-            if (quote != null) {
-                log.info("Quote type: {}", quote.type());
-                if (quote.value() != null) {
-                    log.info("Quote ID: {}", quote.value().id());
-                    log.info("Quote text: '{}'", quote.value().quote());
+            log.info("Quote retrieved: {}", quoteResponse);
+            if (quoteResponse != null) {
+                log.info("Quote type: {}", quoteResponse.type());
+                if (quoteResponse.value() != null) {
+                    log.info("Quote ID: {}", quoteResponse.value().id());
+                    log.info("Quote text: '{}'", quoteResponse.value().quote());
                 }
             }
 
@@ -112,29 +112,28 @@ public class ConsumingRestApplication {
             log.info("--- Testing POST /api/quote ---");
 
             // Create a Value record and Quote record for POST request
-            Value newValue = new Value(null, "some quote");
-            Quote newQuote = new Quote("success", newValue);
+            QuoteRequest newQuote = new QuoteRequest("some quote");
 
             HttpHeaders headers = new HttpHeaders();
             headers.set("Content-Type", "application/json");
-            HttpEntity<Quote> entity = new HttpEntity<>(newQuote, headers);
+            HttpEntity<QuoteRequest> entity = new HttpEntity<>(newQuote, headers);
 
-            ResponseEntity<Quote> response = restTemplate.exchange(
+            ResponseEntity<QuoteResponse> response = restTemplate.exchange(
                     BASE_URL + "/api/quote",
                     HttpMethod.POST,
                     entity,
-                    Quote.class
+                    QuoteResponse.class
             );
 
             log.info("Response status: {}", response.getStatusCode());
-            Quote createdQuote = response.getBody();
-            log.info("Created quote: {}", createdQuote);
+            QuoteResponse createdQuoteResponse = response.getBody();
+            log.info("Created quote: {}", createdQuoteResponse);
 
-            if (createdQuote != null) {
-                log.info("Created quote type: {}", createdQuote.type());
-                if (createdQuote.value() != null) {
-                    log.info("New quote ID: {}", createdQuote.value().id());
-                    log.info("New quote text: '{}'", createdQuote.value().quote());
+            if (createdQuoteResponse != null) {
+                log.info("Created quote type: {}", createdQuoteResponse.type());
+                if (createdQuoteResponse.value() != null) {
+                    log.info("New quote ID: {}", createdQuoteResponse.value().id());
+                    log.info("New quote text: '{}'", createdQuoteResponse.value().quote());
                 }
             }
 
@@ -147,15 +146,15 @@ public class ConsumingRestApplication {
         try {
             log.info("--- Testing DELETE /api/quote/12 ---");
 
-            ResponseEntity<Quote> response = restTemplate.exchange(
+            ResponseEntity<QuoteResponse> response = restTemplate.exchange(
                     BASE_URL + "/api/quote/12",
                     HttpMethod.DELETE,
                     null,
-                    Quote.class
+                    QuoteResponse.class
             );
 
             log.info("Response status: {}", response.getStatusCode());
-            Quote result = response.getBody();
+            QuoteResponse result = response.getBody();
             log.info("Delete result: {}", result);
 
             if (result != null) {
